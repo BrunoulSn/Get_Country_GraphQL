@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Consulta GraphQL</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f5f5f5;
+      padding: 20px;
+    }
+    h1 { text-align: center; }
+    button {
+      padding: 10px 15px;
+      background: #007BFF;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover { background: #0056b3; }
+    #resultado {
+      margin-top: 20px;
+      padding: 15px;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0px 2px 5px rgba(0,0,0,0.1);
+      overflow-y: auto;
+      overflow-x: hidden;
+      max-height: 100vh;
+    }
+    .country {
+      border-bottom: 1px solid #ddd;
+      padding: 10px 0;
+      margin: 2px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Consulta de API GraphQL</h1>
+  <div style="width: 100%; display: grid;">
+      <button onclick="buscarUsuarios()" style="grid-column: 1/1;">Buscar Países</button>
+      <input type="text" id="filtro" placeholder="Filtrar por nome..." oninput="filtrarPaises()" style="grid-column: 3/3;">
+    </div>
+  
+  <div id="resultado"></div>
+  
+  <script>
+    async function buscarUsuarios() {
+      const query = `
+        {
+          countries() {
+            code
+            name
+            capital
+          }
+        }
+      `;
+
+      try {
+        const resposta = await fetch("https://countries.trevorblades.com/", {
+          method: "POST", // precisa ser POST porque sim
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ query })
+        });
+
+        const dados = await resposta.json();
+        const paises = dados.data.countries;
+
+        const container = document.getElementById("resultado");
+        container.innerHTML = "";
+
+        paises.forEach(pais => {
+          container.innerHTML += `
+            <div class="country">
+              <strong>${pais.name}</strong> (${pais.code}) - Capital: ${pais.capital || "N/A"}
+            </div>
+          `;
+        });
+      } catch (erro) {
+        console.error("Erro ao consultar GraphQL:", erro);
+      }
+    }
+
+    function filtrarPaises() {
+      const filter = document.getElementById("filtro").value.toLowerCase();
+      const countriesFilter = document.querySelectorAll(".country");
+
+      countriesFilter.forEach(country => {
+        const nomePais = country.textContent.toLowerCase();
+        if (nomePais.includes(filter)) {
+          country.style.display = "";
+        } else {
+          country.style.display = "none";
+        }
+      });
+    }
+  </script>
+</body>
+</html>
