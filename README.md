@@ -61,9 +61,10 @@ Veja os resultados sendo carregados dinamicamente.
 
 Diferença entre REST e GraphQL.
 
----
 Como escrever uma query GraphQL.
 
 Como consumir GraphQL usando fetch no JavaScript.
 
 Como renderizar os dados no HTML.
+
+---
