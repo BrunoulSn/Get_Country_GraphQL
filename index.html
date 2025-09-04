@@ -43,11 +43,12 @@
       <input type="text" id="filtro" placeholder="Filtrar por nome..." oninput="filtrarPaises()" style="grid-column: 3/3;">
     </div>
   
-  <div id="resultado"></div>
+  <div id="resultado"></div> <!--Create a div, the data will be add here -- Crie uma div os dados serão adicionados aqui-->>
   
   <script>
     async function buscarUsuarios() {
-      const query = `
+      //Query GraphQL to tell the information we want fetch from countries -- Query GraphQL para dizer as informações que desejamos buscar dos países
+        const query = `
         {
           countries() {
             code
@@ -58,34 +59,42 @@
       `;
 
       try {
+        // Prepare the request to the API -- Prepare a requisição para a API
         const resposta = await fetch("https://countries.trevorblades.com/", {
-          method: "POST", // precisa ser POST porque sim
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ query })
+          method: "POST", // GraphQL requests are POST -- Requisições GraphQL são POST
+          headers: { "Content-Type": "application/json" }, // Define the content type -- Define o tipo de conteúdo
+          body: JSON.stringify({ query }) // Send the query in the body -- Envia a query no body
         });
 
-        const dados = await resposta.json();
-        const paises = dados.data.countries;
-
+        // parse the response to json to variable datas -- transforma a resposta para json na variável datas
+        const datas = await resposta.json();
+        // Extract countries data -- Extrai os dados dos países
+        const countries = datas.data.countries;
+        // Get the container div and clear previous results -- Pega a div container e limpa resultados anteriores
         const container = document.getElementById("resultado");
         container.innerHTML = "";
 
-        paises.forEach(pais => {
+        // Loop through countries and add to container -- Loop pelos países e adiciona ao container
+        countries.forEach(pais => {
           container.innerHTML += `
             <div class="country">
               <strong>${pais.name}</strong> (${pais.code}) - Capital: ${pais.capital || "N/A"}
             </div>
           `;
         });
-      } catch (erro) {
+      } catch (erro) { // Handle errors -- Trata erros
         console.error("Erro ao consultar GraphQL:", erro);
       }
     }
 
+    // Function to filter countries by name -- Função para filtrar países por nome
     function filtrarPaises() {
+        // Get the filter value and convert to lowercase -- Pega o valor do filtro e converte para minúsculas
       const filter = document.getElementById("filtro").value.toLowerCase();
+      // Get all country elements -- Pega todos os elementos de país
       const countriesFilter = document.querySelectorAll(".country");
 
+        // Loop through countries and show/hide based on filter -- Loop pelos países e mostra/esconde baseado no filtro
       countriesFilter.forEach(country => {
         const nomePais = country.textContent.toLowerCase();
         if (nomePais.includes(filter)) {
